@@ -1,10 +1,13 @@
 # coding:utf-8
 import json
+import ssl
 
 import requests
 import mimetypes
 import os
 from .Log import Log
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class HttpHandle:
@@ -13,7 +16,7 @@ class HttpHandle:
 
     def get(self, url, params=[], headers={}):
         try:
-            res = self.http.get(url, params=params, headers=headers)
+            res = self.http.get(url, params=params, headers=headers, verify=False)
         except Exception as err:
             Log.error(err)
         Log.info('发送get请求: %s 服务器返回: %s' % (res.url, res.status_code))
@@ -24,7 +27,7 @@ class HttpHandle:
             pass
         return res
 
-    def post(self, url, params=[], headers={}, files=[]):
+    def post(self, url, data=[], params=[], headers={}, files=[]):
         # files = [(file1_key, file1_path), (file2_key, file2_path), ...]
         try:
             multiple_files = [(key, (os.path.split(path)[-1], open(path, 'rb'), mimetypes.guess_type(path)[0])) for
@@ -33,7 +36,7 @@ class HttpHandle:
             Log.error('读取文件失败\n错误信息: %s' % err)
             assert False
         try:
-            res = self.http.post(url, data=params, headers=headers, files=multiple_files)
+            res = self.http.post(url, data=data, params=params, headers=headers, files=multiple_files, verify=False)
         except Exception as err:
             Log.error(err)
             assert False
