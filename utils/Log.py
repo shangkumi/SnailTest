@@ -14,7 +14,7 @@ class LOG:
         LOG.logger = logging.getLogger()
         LOG.logger.setLevel(LogConfig.LOG_LEVEL)
         rotating_handler = logging.handlers.RotatingFileHandler(
-            Config.LOG_FILE_PATH,
+            LogConfig.LOG_FILE_PATH,
             maxBytes=LogConfig.LOG_MAX_SIZE,
             backupCount=LogConfig.LOG_BACKUP_COUNT,
         )
