@@ -1,31 +1,32 @@
-#coding:utf-8
+# coding:utf-8
 import logging
 import logging.handlers
-import os
-from config import Config
+from config import LogConfig
+
 
 class LOG:
     logger = None
+
     @staticmethod
     def getLogger():
         if LOG.logger is not None:
             return LOG.logger
         LOG.logger = logging.getLogger()
-        LOG.logger.setLevel(Config.LOG_LEVEL)
-        Rthandler = logging.handlers.RotatingFileHandler(
-                Config.LOG_FILE_PATH,
-                maxBytes=Config.LOG_MAX_SIZE,
-                backupCount=Config.LOG_BACKUP_COUNT,
-                )
-        StreamHandler = logging.StreamHandler()
+        LOG.logger.setLevel(LogConfig.LOG_LEVEL)
+        rotating_handler = logging.handlers.RotatingFileHandler(
+            Config.LOG_FILE_PATH,
+            maxBytes=LogConfig.LOG_MAX_SIZE,
+            backupCount=LogConfig.LOG_BACKUP_COUNT,
+        )
+        stream_handler = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s-[%(levelname)s][%(module)s][%(funcName)s]-%(message)s')
-        Rthandler.setFormatter(formatter)
-        StreamHandler.setFormatter(formatter)
-        Rthandler.setLevel(Config.FILE_LOG_LEVEL)
-        StreamHandler.setLevel(Config.STREAM_LOG_LEVEL)
-        LOG.logger.addHandler(Rthandler)
-        LOG.logger.addHandler(StreamHandler)
+        rotating_handler.setFormatter(formatter)
+        stream_handler.setFormatter(formatter)
+        rotating_handler.setLevel(LogConfig.FILE_LOG_LEVEL)
+        stream_handler.setLevel(LogConfig.STREAM_LOG_LEVEL)
+        LOG.logger.addHandler(rotating_handler)
+        LOG.logger.addHandler(stream_handler)
         return LOG.logger
 
-Log = LOG.getLogger()
 
+Log = LOG.getLogger()
