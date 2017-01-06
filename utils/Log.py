@@ -8,7 +8,7 @@ class LOG:
     logger = None
 
     @staticmethod
-    def getLogger():
+    def get_logger():
         if LOG.logger is not None:
             return LOG.logger
         LOG.logger = logging.getLogger()
@@ -29,4 +29,4 @@ class LOG:
         return LOG.logger
 
 
-Log = LOG.getLogger()
+Log = LOG.get_logger()
