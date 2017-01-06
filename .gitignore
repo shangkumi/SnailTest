@@ -1,0 +1,12 @@
+*.py[cod]
+*.log
+venv
+data.sqlite
+migrations
+/tests/report/*.html
+*.pid
+.DS_Store
+.project
+.pydevproject
+.settings
+.idea
