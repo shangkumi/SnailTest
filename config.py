@@ -13,8 +13,15 @@ class LogConfig:
     STREAM_LOG_LEVEL = 20
 
 
-class DBINFO:
+class DBInfo:
     DUOBAO_TEST = {
         'TYPE': 'Oracle',
         'DBINFO': 'duobao_app_new/duobao_appd3M8@10.120.240.252:9538/oratest',
+    }
+
+
+class RedisInfo:
+    REDIS_TEST = {
+        'host': '10.120.241.210',
+        'password': '1qaz2wsxX',
     }
