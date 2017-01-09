@@ -1,7 +1,7 @@
 # coding:utf-8
-from action.yylg.api_action import API
-from action.yylg.duobao_db_action import Duobao
-from action.yylg.redis_action import RedisAction
+from action.yylg.floating_view_action import FloatingViewAction
+from action.yylg.base_duobao_db_action import Duobao
+from action.yylg.base_redis_action import RedisAction
 from utils.Log import Log
 
 
@@ -20,16 +20,19 @@ def floating_view_test(channel, account_id):
         'userName': account_id,
     }
 
-    r = API.floating_view(query, data)
+    r = FloatingViewAction.floating_view(query, data)
     Log.info(r)
 
 if __name__ == '__main__':
-    ACCOUNT_ID = 'urstestzhubo0000@126.com'
+    # ACCOUNT_ID = 'urstestzhubo0000@126.com'
     # result = Duobao.query_user_pay_act_by_account(ACCOUNT_ID)
     # Log.info(result)
 
-    order_num = RedisAction.get_new_user_marketing_order_num(ACCOUNT_ID)
-    Log.info(order_num)
+
+    # order_num = RedisAction.get_new_user_marketing_order_num(ACCOUNT_ID)
+    # Log.info(order_num)
 
     # floating_view_test('legou', ACCOUNT_ID)
     # floating_view_test('legou', '')
+
+    FloatingViewAction.query_floating_view_setting()

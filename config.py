@@ -25,3 +25,8 @@ class RedisInfo:
         'host': '10.120.241.210',
         'password': '1qaz2wsxX',
     }
+
+
+class OpenId:
+    USERNAME = 'zhubo'
+    PASSWORD = 'zbwillD1T'
