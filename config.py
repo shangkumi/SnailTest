@@ -4,6 +4,19 @@ import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
+class AppConfig:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess'
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'data.sqlite')
+
+    @classmethod
+    def init_app(cls, app):
+        # 处理代理服务器首部
+        from werkzeug.contrib.fixers import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app)
+
+
 class LogConfig:
     LOG_LEVEL = 0
     LOG_FILE_PATH = os.path.join(BASE_DIR, 'log', 'Snail.log')

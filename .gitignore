@@ -3,7 +3,6 @@
 venv
 data.sqlite
 migrations
-/tests/report/*.html
 *.pid
 .DS_Store
 .project

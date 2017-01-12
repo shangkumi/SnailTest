@@ -1,4 +1,6 @@
 # coding:utf-8
+from action.yylg.floating_view_action import FloatingViewAction
+
 
 class FloatingViewTest:
     """
@@ -28,16 +30,17 @@ class FloatingViewTest:
         pass
 
     def base_test(self):
-        query = {
-            'product': 'android_cp_hyg',
-            'ver': '1.5',
-            'apiLevel': '28',
-            'channel': 'legou',
-            'deviceId': '351670063004332',
-            'apiVer': '1.1',
-            'mobileType': 'android',
-        }
-
+        # data = {
+        #     'userName': 'urstestzhubo0000@126.com',
+        #     'channel': 'legou',
+        # }
         data = {
-            'userName': 'urstestzhubo0000@126.com',
+            'userName': 'zbwill',
+            'channel': 'test1',
         }
+        r = FloatingViewAction.floating_view(data)
+        print(r)
+
+if __name__ == '__main__':
+    f = FloatingViewTest()
+    f.base_test()

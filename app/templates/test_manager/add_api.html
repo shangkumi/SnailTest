@@ -1,0 +1,132 @@
+{% extends "test_manager/base_api.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}添加接口{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <!--表单部分-->
+    <div class="add_api">
+        <div class="form-group">
+            <label for="api_name" class="control-label">接口名称</label>
+            <input type="text" id="api_name" class="form-control" name="api_name" value="">
+        </div>
+        <div class="input-group">
+            <span class="input-group-btn">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#filePathModal">选择接口测试文件</button>
+            </span>
+            <input type="text" id="file_path" class="form-control" name="file_path" required="" value="" disabled>
+        </div>
+        <div class="form-group">
+            <label for="class_name">选择类名</label>
+            <select class="form-control" name="class_name" id="class_name">
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="desc">备注</label>
+            <textarea id="remark" class="form-control" type="text" value="" name="remark"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="add_api()">新增测试接口</button>
+    </div>
+
+
+    <!--弹出选择接口测试文件 模态框-->
+    <div class="modal fade" id="filePathModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        请选择接口对应的测试文件
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    {% if file_dict['not_binded_file'] %}
+                        {% for not_binded_file in file_dict['not_binded_file'] %}
+                        <div class="radio choose_file_path">
+                            <label>
+                                <input type="radio" name="test_case_file_radios" value="{{ not_binded_file }}"> {{ not_binded_file }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if file_dict['binded_api'] %}
+                    <hr />
+                    {% for api in file_dict['binded_api'] %}
+                    <div class="radio choose_file_path">
+                        <label>
+                            <input type="radio" name="test_case_file_radios" value="{{ api.file_path }}"> {{ api.file_path }}--{{ api.class_name }}类, 已绑定过 {{ api.api_name }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="select_test_api()">
+                        选择
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts%}
+{{ super() }}
+<script>
+//    从后端获取选取的接口测试文件的类
+    function select_test_api(){
+        var file_path = $("#file_path");
+        var choose_file_path = $('.choose_file_path input[name="test_case_file_radios"]:checked ').val();
+        var class_name = $("select[name='class_name']");
+        file_path.val(choose_file_path);
+
+        $.get("{{ url_for('test_manager.find_test_class') }}",
+                {
+                    file_path: choose_file_path,
+                },
+                function(data, status){
+                    if(data.result) {
+                        class_name.empty();
+                        for(i=0;i<data.class_list.length;i++){
+                            class_name.append('<option value="'+data.class_list[i]+'">'+data.class_list[i]+'</option>');
+                        }
+                    } else {
+                        alert(data.des);
+                        location.href = "{{ url_for('test_manager.add_api') }}";
+                    }
+                }, "json");
+        $('#filePathModal').modal('hide');
+    }
+
+//    提交新增测试接口请求
+    function add_api(){
+        var api_name = $('#api_name').val();
+        var file_path = $('#file_path').val();
+        var class_name = $('#class_name').val();
+        var remark = $('#remark').val();
+
+        $.post("{{ url_for('test_manager.add_api') }}",
+                {
+                    api_name: api_name,
+                    file_path: file_path,
+                    class_name: class_name,
+                    remark: remark,
+                },
+                function(data, status){
+                    if(data.result == 100) {
+                        location.href = "{{ url_for('test_manager.index') }}";
+                    } else {
+                        alert(data.resultDesc);
+                    };
+                }, "json");
+    }
+</script>
+{% endblock %}
