@@ -21,15 +21,15 @@
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" href="/">Snail App</a>
+                            <a class="navbar-brand" href="{{ url_for('test_manager.index') }}">Snail App</a>
                         </div>
                         <div class="navbar-collapse collapse">
                             <ul class="nav navbar-nav">
                                 <li><a href="{{ url_for('test_manager.index') }}">测试管理平台</a></li>
                             </ul>
-                            <ul class="nav navbar-nav">
-                                <li><a href="{{ url_for('test_manager.index') }}">1元购测试工具</a></li>
-                            </ul>
+                            <!--<ul class="nav navbar-nav">-->
+                                <!--<li><a href="{{ url_for('test_manager.index') }}">1元购测试工具</a></li>-->
+                            <!--</ul>-->
                         </div>
                     </div>
                     {% endblock%}

@@ -1,0 +1,76 @@
+{% extends "test_manager/base_api.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}添加接口{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <div class="input-group">
+        <input type="text" id="search_key" class="form-control" name="search_key" value="">
+        <span class="input-group-btn">
+            <button class="btn btn-primary" onclick="search()">搜索接口</button>
+        </span>
+    </div>
+    <hr />
+    <table class="table table-hover">
+        <caption><h4>测试接口列表</h4></caption>
+        <thead>
+            <tr>
+                <th>接口名称</th>
+                <th>接口测试文件</th>
+                <th>接口测试类名</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for api in apis %}
+            <tr>
+                <td class="class_name"><a>{{ api.api_name }}</a></td>
+                <td class="file_path">{{ api.file_path }}</td>
+                <td class="class_name">{{ api.class_name }}</td>
+                <td class="operate">
+                    <a href="{{ url_for('test_manager.delete_api', api_id=api.id) }}" onclick="return confirm('确定要删除接口及包含的用例/数据吗？')">删除</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>search();</script>
+{% endblock %}
+
+{% block scripts%}
+{{ super() }}
+<script>
+    function search() {
+        var key = $("#search_key").val();
+        var table = $("tbody");
+        $.post("{{ url_for('test_manager.api_list') }}",
+                {
+                    key_word: key,
+                },
+                function(data, status){
+                    table.empty();
+                    for(i=0;i<data.length;i++) {
+                        alert(i);
+                        var tr = $("<tr></tr>");
+                        tr.append($('<td class="api_name"><a href="">'+data[i].api_name+'</a></td>'));
+                        tr.append($('<td class="file_path">'+data[i].file_path+'</td>'));
+                        tr.append($('<td class="class_name">'+data[i].class_name+'</td>'));
+                        var td = $('<td class="operate"></td>');
+                        var a = $('<a>删除</a>');
+                        a.attr('href', "{{ url_for('test_manager.delete_api', api_id="+data[i].api_id+") }}");
+                        a.attr('onclick', "return confirm('确定要删除接口及包含的用例/数据吗？')");
+                        td.append(a);
+                        tr.append(td);
+                        table.append(tr);
+                    };
+                }, "json");
+    }
+    $(function() {
+        search()
+        $("table tr:nth-child(even)").addClass("even");
+    });
+</script>
+{% endblock %}

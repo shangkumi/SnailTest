@@ -5,7 +5,7 @@
 {% block row_menu %}
 <ul class="nav nav-pills nav-stacked well">
     <li id="index-menu"><a href="{{ url_for('test_manager.index') }}">首页</a></li>
-    <li id="api-menu"><a href="{{ url_for('test_manager.index') }}">测试接口</a></li>
+    <li id="api-menu"><a href="{{ url_for('test_manager.api_list') }}">测试接口</a></li>
     <li id="suite-menu"><a href="{{ url_for('test_manager.index') }}">测试集</a></li>
 </ul>
 {% endblock %}

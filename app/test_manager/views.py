@@ -1,17 +1,34 @@
 # coding:utf-8
 from app import db
-from app.models import Api
+from app.models import Api, Suite
 from app.test_manager import test_manager
-from app.test_manager.forms import AddApiForm
 
 from flask import render_template, flash, redirect, url_for, request, jsonify
 
 from app.test_manager.test_engine import TestEngine
+from utils.Log import Log
 
 
 @test_manager.route('/test_manager/')
 def index():
     return render_template('/test_manager/index.html')
+
+
+@test_manager.route('/test_manager/api_list/', methods=['GET', 'POST'])
+def api_list():
+    if request.method == 'GET':
+        return render_template('/test_manager/api_list.html')
+    if request.method == 'POST':
+        key_word = request.form.get('key_word')
+        apis = Api.query.all()
+        if not key_word.strip():
+            result = [{'api_id': i.id, 'api_name': i.api_name, 'file_path': i.file_path, 'class_name': i.class_name} for
+                      i in apis]
+            return jsonify(result)
+        result = [{'api_id': i.id, 'api_name': i.api_name, 'file_path': i.file_path, 'class_name': i.class_name} for i
+                  in apis if (key_word in i.api_name) or (key_word in i.file_path) or (key_word in i.class_name)]
+        return jsonify(result)
+    return render_template('/test_manager/api_list.html')
 
 
 @test_manager.route('/test_manager/add_api/', methods=['GET', 'POST'])
@@ -50,7 +67,6 @@ def add_api():
             return jsonify(result)
 
 
-
 @test_manager.route('/test_manager/find_test_class/')
 def find_test_class():
     test_file_path = request.args.get('file_path')
@@ -60,3 +76,25 @@ def find_test_class():
     else:
         result = {'result': True, 'class_list': class_list}
     return jsonify(result)
+
+
+@test_manager.route('/test_manager/delete_api/<api_id>')
+def delete_api(api_id):
+    api = Api.query.get_or_404(int(api_id))
+    for test_case in api.test_cases:
+        for test_data in test_case.test_datas:
+            for suite in Suite.query.all():
+                if test_data in suite.test_datas:
+                    suite.test_datas.remove(test_data)
+                db.session.add(suite)
+            db.session.delete(test_data)
+        db.session.delete(test_case)
+    db.session.delete(api)
+    try:
+        db.session.commit()
+        flash('测试接口信息及其包含的测试用例/测试数据已删除完毕')
+    except Exception as err:
+        db.session.rollback()
+        flash('删除失败')
+        Log.error('测试接口删除失败\n%s' % err)
+    return redirect(url_for('test_manager.api_list'))
