@@ -76,6 +76,7 @@ def add_api():
 
 @test_manager.route('/test_manager/find_test_class/')
 def find_test_class():
+    """通过文件路径, 获取文件中的类"""
     test_file_path = request.args.get('file_path')
     class_list = TestEngine.find_test_class(test_file_path)
     if isinstance(class_list, str):
