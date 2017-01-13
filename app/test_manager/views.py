@@ -9,6 +9,13 @@ from app.test_manager.test_engine import TestEngine
 from utils.Log import Log
 
 
+class ResultCode:
+    SUCCESS = 100
+    SAME_API_NAME_ERROR = -100
+    FILE_AND_CLASS_BINDED = -101
+    DB_ERROR = -200
+
+
 @test_manager.route('/test_manager/')
 def index():
     return render_template('/test_manager/index.html')
@@ -42,16 +49,16 @@ def add_api():
         class_name = request.form.get('class_name')
         remark = request.form.get('remark')
 
-        result = {'result': 100, 'resultDesc': '新增测试接口成功', 'api_id': ''}
+        result = {'result': ResultCode.SUCCESS, 'resultDesc': '新增测试接口成功', 'api_id': ''}
         # 验证是否满足条件新建
         if Api.query.filter_by(api_name=api_name).first():
-            result['result'] = -100
+            result['result'] = ResultCode.SAME_API_NAME_ERROR
             result['resultDesc'] = '已有同名接口'
             return jsonify(result)
 
         api_by_file_path_and_class = Api.query.filter_by(file_path=file_path, class_name=class_name).first()
         if api_by_file_path_and_class:
-            result['result'] = -101
+            result['result'] = ResultCode.FILE_AND_CLASS_BINDED
             result['resultDesc'] = '文件的该类已绑定测试接口: %s' % api_by_file_path_and_class.api_name
             return jsonify(result)
 
@@ -62,7 +69,7 @@ def add_api():
             result['api_id'] = api.id
             return jsonify(result)
         except Exception as err:
-            result['result'] = -200
+            result['result'] = ResultCode.DB_ERROR
             result['resultDesc'] = '数据库错误 \n%s' % err
             return jsonify(result)
 
@@ -78,8 +85,9 @@ def find_test_class():
     return jsonify(result)
 
 
-@test_manager.route('/test_manager/delete_api/<api_id>')
-def delete_api(api_id):
+@test_manager.route('/test_manager/delete_api/')
+def delete_api():
+    api_id = request.args.get('api_id')
     api = Api.query.get_or_404(int(api_id))
     for test_case in api.test_cases:
         for test_data in test_case.test_datas:
@@ -92,9 +100,8 @@ def delete_api(api_id):
     db.session.delete(api)
     try:
         db.session.commit()
-        flash('测试接口信息及其包含的测试用例/测试数据已删除完毕')
+        Log.info('删除成功')
+        return jsonify({'result': ResultCode.SUCCESS, 'resultDesc': '删除成功'})
     except Exception as err:
         db.session.rollback()
-        flash('删除失败')
-        Log.error('测试接口删除失败\n%s' % err)
-    return redirect(url_for('test_manager.api_list'))
+        return jsonify({'result': ResultCode.DB_ERROR, 'resultDesc': '删除失败'})

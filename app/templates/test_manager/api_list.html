@@ -2,16 +2,22 @@
 
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}添加接口{% endblock %}
+{% block title %}接口列表{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
+    <p>
+        <a class="btn btn-info" href="{{ url_for('test_manager.add_api') }}">
+            <span class="glyphicon glyphicon-plus"></span>新增测试接口
+        </a>
+    </p>
     <div class="input-group">
         <input type="text" id="search_key" class="form-control" name="search_key" value="">
         <span class="input-group-btn">
             <button class="btn btn-primary" onclick="search()">搜索接口</button>
         </span>
     </div>
+
     <hr />
     <table class="table table-hover">
         <caption><h4>测试接口列表</h4></caption>
@@ -23,21 +29,10 @@
                 <th>操作</th>
             </tr>
         </thead>
-        <tbody>
-        {% for api in apis %}
-            <tr>
-                <td class="class_name"><a>{{ api.api_name }}</a></td>
-                <td class="file_path">{{ api.file_path }}</td>
-                <td class="class_name">{{ api.class_name }}</td>
-                <td class="operate">
-                    <a href="{{ url_for('test_manager.delete_api', api_id=api.id) }}" onclick="return confirm('确定要删除接口及包含的用例/数据吗？')">删除</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
+        <tbody></tbody>
     </table>
 </div>
-<script>search();</script>
+
 {% endblock %}
 
 {% block scripts%}
@@ -53,24 +48,38 @@
                 function(data, status){
                     table.empty();
                     for(i=0;i<data.length;i++) {
-                        alert(i);
                         var tr = $("<tr></tr>");
                         tr.append($('<td class="api_name"><a href="">'+data[i].api_name+'</a></td>'));
                         tr.append($('<td class="file_path">'+data[i].file_path+'</td>'));
                         tr.append($('<td class="class_name">'+data[i].class_name+'</td>'));
                         var td = $('<td class="operate"></td>');
-                        var a = $('<a>删除</a>');
-                        a.attr('href', "{{ url_for('test_manager.delete_api', api_id="+data[i].api_id+") }}");
-                        a.attr('onclick', "return confirm('确定要删除接口及包含的用例/数据吗？')");
-                        td.append(a);
+                        var btn = $('<button class="btn btn-primary" onclick="delete_api('+data[i].api_id+')">删除</button>')
+                        td.append(btn);
                         tr.append(td);
                         table.append(tr);
                     };
                 }, "json");
     }
-    $(function() {
-        search()
-        $("table tr:nth-child(even)").addClass("even");
+
+    function delete_api(api_id) {
+        if (confirm('确定要删除接口及包含的用例/数据吗？')) {
+            $.get("{{ url_for('test_manager.delete_api') }}",
+                    {
+                        api_id: api_id,
+                    },
+                    function (data, status) {
+                        if (data.result == 100) {
+                            alert('测试接口信息及其包含的测试用例/测试数据已删除完毕');
+                            search();
+                        } else {
+                            alert(data.resultDesc);
+                        }
+                    }, "json");
+        }
+    }
+
+    $(window).load(function(){
+        search();
     });
 </script>
 {% endblock %}

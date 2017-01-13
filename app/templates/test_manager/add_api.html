@@ -119,7 +119,7 @@
                 },
                 function(data, status){
                     if(data.result == 100) {
-                        location.href = "{{ url_for('test_manager.index') }}";
+                        location.href = "{{ url_for('test_manager.api_list') }}";
                     } else {
                         alert(data.resultDesc);
                     };
