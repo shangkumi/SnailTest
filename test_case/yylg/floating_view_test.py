@@ -2,6 +2,10 @@
 from action.yylg.floating_view_action import FloatingViewAction
 
 
+
+class Test0:
+    pass
+
 class FloatingViewTest:
     """
     新手浮标接口:
@@ -40,6 +44,12 @@ class FloatingViewTest:
         }
         r = FloatingViewAction.floating_view(data)
         print(r)
+
+class Test1:
+    pass
+
+class Test2:
+    pass
 
 if __name__ == '__main__':
     f = FloatingViewTest()

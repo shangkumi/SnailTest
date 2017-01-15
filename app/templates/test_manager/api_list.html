@@ -46,18 +46,24 @@
                     key_word: key,
                 },
                 function(data, status){
-                    table.empty();
-                    for(i=0;i<data.length;i++) {
-                        var tr = $("<tr></tr>");
-                        tr.append($('<td class="api_name"><a href="">'+data[i].api_name+'</a></td>'));
-                        tr.append($('<td class="file_path">'+data[i].file_path+'</td>'));
-                        tr.append($('<td class="class_name">'+data[i].class_name+'</td>'));
-                        var td = $('<td class="operate"></td>');
-                        var btn = $('<button class="btn btn-primary" onclick="delete_api('+data[i].api_id+')">删除</button>')
-                        td.append(btn);
-                        tr.append(td);
-                        table.append(tr);
-                    };
+                    if(data.result == 100){
+                        table.empty();
+                        for(i=0;i<data.api_list.length;i++) {
+                            var tr = $("<tr></tr>");
+                            var url = "{{ url_for('test_manager.modify_api') }}?api_id=" + data.api_list[i].api_id
+                            tr.append($('<td class="api_name"><a href="'+url+'">'+data.api_list[i].api_name+'</a></td>'));
+                            tr.append($('<td class="file_path">'+data.api_list[i].file_path+'</td>'));
+                            tr.append($('<td class="class_name">'+data.api_list[i].class_name+'</td>'));
+                            var td = $('<td class="operate"></td>');
+                            var btn = $('<button class="btn btn-primary" onclick="delete_api('+data.api_list[i].api_id+')">删除</button>')
+                            td.append(btn);
+                            tr.append(td);
+                            table.append(tr);
+                        };
+                    } else{
+                        alert(data.resultDesc);
+                    }
+
                 }, "json");
     }
 

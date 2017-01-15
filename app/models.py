@@ -8,7 +8,7 @@ class Api(db.Model):
     __tablename__ = 'api'
     id = db.Column(db.Integer, primary_key=True)
     api_name = db.Column(db.String(64), unique=True, index=True)
-    file_path = db.Column(db.String(64), unique=True)
+    file_path = db.Column(db.String(64))
     class_name = db.Column(db.String(64))
     remark = db.Column(db.Text())
 

@@ -2,6 +2,7 @@
 import os
 
 from app.models import Api
+from app.templates.test_manager.result_code import ResultCode
 from config import BASE_DIR
 
 
@@ -18,9 +19,9 @@ class TestEngine:
                 file_list.extend(f)
         file_dict = {'not_binded_file': [], 'binded_api': []}
         for file_path in file_list:
-            api = Api.query.filter_by(file_path=file_path).first()
-            if api:
-                file_dict['binded_api'].append(api)
+            apis = Api.query.filter_by(file_path=file_path).all()
+            if apis:
+                file_dict['binded_api'].append(apis)
             else:
                 file_dict['not_binded_file'].append(file_path)
         return file_dict
@@ -32,11 +33,13 @@ class TestEngine:
             class_list = [i.strip().replace('class ', '').replace(':', '') for i in open(abspath) if
                           i.strip().startswith('class ')]
         else:
-            return '未找到文件: %s' % abspath
+            return ResultCode.FILE_NOT_FOUND
         if class_list:
-            return class_list
+            result = ResultCode.SUCCESS
+            result['class_list'] = class_list
+            return result
         else:
-            return '未找到测试类'
+            return ResultCode.CLASS_NOT_FOUND
 
 
 if __name__ == '__main__':

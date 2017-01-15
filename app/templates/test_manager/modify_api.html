@@ -2,21 +2,25 @@
 
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}添加接口{% endblock %}
+{% block title %}修改测试接口信息{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
     <!--表单部分-->
-    <div class="add_api">
+    <div class="modify_api">
+        <div class="form-group">
+            <label for="api_id" class="control-label">接口ID</label>
+            <input type="text" id="api_id" class="form-control" name="api_id" value="{{ api.id }}" disabled>
+        </div>
         <div class="form-group">
             <label for="api_name" class="control-label">接口名称</label>
-            <input type="text" id="api_name" class="form-control" name="api_name" value="">
+            <input type="text" id="api_name" class="form-control" name="api_name" value="{{ api.api_name }}">
         </div>
         <div class="input-group">
             <span class="input-group-btn">
                 <button class="btn btn-primary" data-toggle="modal" data-target="#filePathModal">选择接口测试文件</button>
             </span>
-            <input type="text" id="file_path" class="form-control" name="file_path" required="" value="" disabled>
+            <input type="text" id="file_path" class="form-control" name="file_path" required="" value="{{ api.file_path }}" disabled>
         </div>
         <div class="form-group">
             <label for="class_name">选择类名</label>
@@ -25,9 +29,9 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="remark">备注</label>
-            <textarea id="remark" class="form-control" type="text" value="" name="remark"></textarea>
+            <textarea id="remark" class="form-control" type="text" value="{{ api.remark }}" name="remark">{{ api.remark }}</textarea>
         </div>
-        <button class="btn btn-primary" onclick="add_api()">新增测试接口</button>
+        <button class="btn btn-primary" onclick="modify_api()">修改测试接口</button>
     </div>
 
 
@@ -82,6 +86,26 @@
 {% block scripts%}
 {{ super() }}
 <script>
+    function get_class_list(){
+        var file_path = $("#file_path").val();
+        var class_name = $("select[name='class_name']");
+        $.get("{{ url_for('test_manager.find_test_class') }}",
+                {
+                    file_path: file_path,
+                },
+                function(data, status){
+                    if(data.result) {
+                        class_name.empty();
+                        for(i=0;i<data.class_list.length;i++){
+                            class_name.append('<option value="'+data.class_list[i]+'">'+data.class_list[i]+'</option>');
+                        }
+                        $('option[value="{{api.class_name}}"]').attr('selected', true);
+                    } else {
+                        alert(data.des);
+                    }
+                }, "json");
+    }
+
 //    从后端获取选取的接口测试文件的类
     function select_test_api(){
         var file_path = $("#file_path");
@@ -94,25 +118,27 @@
                     file_path: choose_file_path,
                 },
                 function(data, status){
-                    if(data.result == 100) {
+                    if(data.result) {
                         class_name.empty();
                         for(i=0;i<data.class_list.length;i++){
                             class_name.append('<option value="'+data.class_list[i]+'">'+data.class_list[i]+'</option>');
                         }
                     } else {
-                        alert(data.resultDesc);
+                        alert(data.des);
                         location.href = "{{ url_for('test_manager.add_api') }}";
                     }
                 }, "json");
         $('#filePathModal').modal('hide');
     }
 
-//    提交新增测试接口请求
-    function add_api(){
+//    提交修改测试接口请求
+    function modify_api(){
+        var api_id = $('#api_id').val();
         var api_name = $('#api_name').val();
         var file_path = $('#file_path').val();
         var class_name = $('#class_name').val();
         var remark = $('#remark').val();
+
         if ($.trim(api_name) == '' || api_name == null || api_name == undefined) {
             alert('接口名称不能为空');
             return
@@ -126,8 +152,9 @@
             return
         }
 
-        $.post("{{ url_for('test_manager.add_api') }}",
+        $.post("{{ url_for('test_manager.modify_api') }}",
                 {
+                    api_id: api_id,
                     api_name: api_name,
                     file_path: file_path,
                     class_name: class_name,
@@ -141,5 +168,9 @@
                     };
                 }, "json");
     }
+
+    $(window).load(function(){
+        get_class_list();
+    });
 </script>
 {% endblock %}
