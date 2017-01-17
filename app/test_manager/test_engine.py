@@ -1,9 +1,11 @@
 # coding:utf-8
+import importlib
 import os
 
 from app.models import Api
-from app.templates.test_manager.result_code import ResultCode
+from app.test_manager.result_code import ResultCode
 from config import BASE_DIR
+from utils.Log import Log
 
 
 class TestEngine:
@@ -41,6 +43,35 @@ class TestEngine:
         else:
             return ResultCode.CLASS_NOT_FOUND
 
+    @classmethod
+    def get_test_file_code(cls, file_path):
+        abspath = os.path.join(BASE_DIR, 'test_case', file_path)
+        Log.info(abspath)
+        if os.path.exists(abspath) and os.path.isfile(abspath):
+            code = open(abspath).read()
+            return code
+        else:
+            return ResultCode.FILE_NOT_FOUND
+
+    @classmethod
+    def get_test_function(cls, api_id):
+        api = Api.query.get_or_404(api_id)
+        if cls.get_test_file_code(api.file_path) == ResultCode.FILE_NOT_FOUND:
+            return ResultCode.FILE_NOT_FOUND
+        module_str = 'test_case.' + api.file_path.replace('.py', '').replace(os.path.sep, '.')
+        module_str = module_str.replace('..', '.')
+        module_str = module_str.replace('\\', '.')
+        module_str = module_str.replace('/', '.')
+        module = importlib.import_module(module_str)
+        try:
+            test_class = getattr(module, api.class_name)
+            function_list = [i for i in dir(test_class) if not i.startswith('__') and callable(getattr(test_class, i))]
+            result = ResultCode.SUCCESS
+            result['func_list'] = function_list
+            return result
+        except AttributeError as err:
+            Log.error(err)
+            return ResultCode.CLASS_NOT_FOUND
 
 if __name__ == '__main__':
     # TestEngine.get_test_case_file_list()

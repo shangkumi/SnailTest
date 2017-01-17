@@ -45,6 +45,12 @@ class FloatingViewTest:
         r = FloatingViewAction.floating_view(data)
         print(r)
 
+    def test1(self):
+        pass
+
+    def test2(self):
+        pass
+
 class Test1:
     pass
 

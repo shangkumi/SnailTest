@@ -1,11 +1,11 @@
 # coding:utf-8
 from app import db
 from app.models import Api, Suite
-from app.templates.test_manager.result_code import ResultCode
 from app.test_manager import test_manager
 
 from flask import render_template, flash, redirect, url_for, request, jsonify
 
+from app.test_manager.result_code import ResultCode
 from app.test_manager.test_engine import TestEngine
 from utils.Log import Log
 
@@ -19,7 +19,8 @@ def index():
 def api_info():
     api_id = request.args.get('api_id')
     api = Api.query.get_or_404(api_id)
-    return render_template('/test_manager/api_info.html', api=api)
+    code = TestEngine.get_test_file_code(api.file_path)
+    return render_template('/test_manager/api_info.html', api=api, code=code)
 
 
 @test_manager.route('/test_manager/api_list/', methods=['GET', 'POST'])
@@ -40,6 +41,26 @@ def api_list():
             in apis if (key_word in i.api_name) or (key_word in i.file_path) or (key_word in i.class_name)]
         return jsonify(result)
     return render_template('/test_manager/api_list.html')
+
+
+@test_manager.route('/test_manager/add_test_case/')
+def add_test_case():
+    if request.method == 'GET':
+        api_id = request.args.get('api_id')
+        api = Api.query.get_or_404(api_id)
+        result = TestEngine.get_test_function(api_id)
+        if result == ResultCode.FILE_NOT_FOUND or result == ResultCode.CLASS_NOT_FOUND:
+            flash(result['resultDesc'] + '请修改测试接口')
+            return redirect(url_for('test_manager.modify_api', api_id=api_id))
+
+        return render_template('/test_manager/add_test_case.html', api=api, func_list=result['func_list'])
+
+
+# @test_manager.route('/test_manager/get_test_function/')
+# def get_test_function():
+#     api_id = request.args.get('api_id')
+#     result = TestEngine.get_test_function(api_id)
+#     return jsonify(result)
 
 
 @test_manager.route('/test_manager/add_api/', methods=['GET', 'POST'])

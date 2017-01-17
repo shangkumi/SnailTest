@@ -1,0 +1,134 @@
+{% extends "test_manager/base_api.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}接口信息{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumb">
+            <li><a href="{{ url_for('test_manager.api_list') }}">接口列表</a></li>
+            <li class="active">{{ api.api_name }}</li>
+        </div>
+    </div>
+    <div class="col-xs-8">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">接口基本信息</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-hover" style="table-layout:fixed;">
+                    <tbody>
+                        <tr>
+                            <td width="25%">接口ID</td>
+                            <td>{{ api.id }}</td>
+                        </tr>
+                        <tr>
+                            <td>接口名称</td>
+                            <td>{{ api.api_name }}</td>
+                        </tr>
+                        <tr>
+                            <td>接口测试文件</td>
+                            <td>{{ api.file_path }}</td>
+                        </tr>
+                        <tr>
+                            <td>接口测试类</td>
+                            <td>{{ api.class_name }}</td>
+                        </tr>
+                        <tr>
+                            <td>备注</td>
+                            <td style="word-wrap:break-word;">{{ api.remark }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">接口操作</h3>
+            </div>
+            <div class="panel=body">
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="{{ url_for('test_manager.add_test_case', api_id=api.id) }}">添加模块</a></li>
+                    <li class="list-group-item"><a href="{{ url_for('test_manager.modify_api', api_id=api.id) }}">修改接口信息</a></li>
+                    <li class="list-group-item"><a onclick="delete_api('{{ api.id }}')">删除测试项目</a></li>
+                    <li class="list-group-item"><a data-toggle="modal" data-target="#codeModal">接口测试文件代码</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">项目结构</h3>
+            </div>
+            <div class="panel-body">
+                <ul>
+                    for module in project.modules
+                    <li><a href="url_for('testManage.moduleInfo', moduleId=module.id)" style="color:green">module.moduleName</a></li>
+                    <ul>
+                        for testCase in module.testCases
+                        <li><a href="url_for('testManage.testCaseInfo', testCaseId=testCase.id)" style="color:DodgerBlue"> testCase.caseName </a></li>
+                        <ul>
+                            for data in testCase.datas
+                            <li><a href="url_for('testManage.dataInfo', dataId=data.id)" style="color:DarkViolet"> data.dataName</a></li>
+                             endfor
+                        </ul>
+                        endfor
+                    </ul>
+                    endfor
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!--弹出选择接口测试文件 模态框-->
+    <div class="modal fade" id="codeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        接口测试内容
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <pre>{{ code }}</pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts%}
+{{ super() }}
+<script>
+    function delete_api(api_id) {
+        if (confirm('确定要删除接口及包含的用例/数据吗？')) {
+            $.get("{{ url_for('test_manager.delete_api') }}",
+                    {
+                        api_id: api_id,
+                    },
+                    function (data, status) {
+                        if (data.result == 100) {
+                            alert('测试接口信息及其包含的测试用例/测试数据已删除完毕');
+                            location.href = "{{ url_for('test_manager.api_list') }}";
+                        } else {
+                            alert(data.resultDesc);
+                        }
+                    },
+                    "json"
+            );
+        }
+    }
+</script>
+{% endblock %}
