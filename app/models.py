@@ -54,7 +54,7 @@ class Suite(db.Model):
     suite_name = db.Column(db.String(64), unique=True, index=True)
     remark = db.Column(db.Text())
 
-    testReports = db.relationship('TestReport', backref='suite')
+    test_reports = db.relationship('TestReport', backref='suite')
     test_datas = db.relationship('TestData', secondary=suiteData,
                                  backref=db.backref('suites', lazy='dynamic'),
                                  lazy='dynamic')

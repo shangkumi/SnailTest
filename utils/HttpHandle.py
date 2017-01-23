@@ -5,10 +5,13 @@ import ssl
 import requests
 import mimetypes
 import os
+
+from requests.packages import urllib3
+
 from .Log import Log
 
 ssl._create_default_https_context = ssl._create_unverified_context
-
+urllib3.disable_warnings()
 
 class HttpHandle:
     def __init__(self):

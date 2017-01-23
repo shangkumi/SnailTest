@@ -1,0 +1,61 @@
+{% extends "test_manager/base_suite.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}测试套件列表{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumb">
+            <li><a href="{{ url_for('test_manager.suite_list') }}">测试套件列表</a></li>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <p>
+            <a class="btn btn-info" href="{{ url_for('test_manager.add_suite') }}">
+                <span class="glyphicon glyphicon-plus"></span>新增测试接套件
+            </a>
+        </p>
+        <hr />
+        <div class="panel-group" id="accordion">
+            {% for suite in suites %}
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a href="{{ url_for('test_manager.suite_info', suite_id=suite.id) }}">{{ suite.suite_name }}</a>
+                        |
+                        <a data-toggle="collapse" data-parent="#accordion" href="#suite-{{ suite.id }}">
+                            <small>测试套件信息</small>
+                        </a>
+                    </h4>
+                </div>
+                <div id="suite-{{ suite.id }}" class="panel-collapse collapse">
+                    <div class="panel-body" style="word-wrap: break-word;word-break:break-all;">
+                        <table class="table table-hover" style="table-layout:fixed;">
+                            <tbody>
+                                <tr>
+                                    <td width="25%">测试套件ID</td>
+                                    <td>{{ suite.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td>测试套件名称</td>
+                                    <td>{{ suite.suite_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>备注</td>
+                                    <td style="word-wrap:break-word;">{{ suite.remark }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if not suites %}
+            <p>暂时没有测试集</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

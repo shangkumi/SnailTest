@@ -1,0 +1,88 @@
+{% extends "test_manager/base_suite.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block head %}
+{{ super() }}
+<style type="text/css">
+.checks{ padding-left:20px }
+</style>
+{% endblock %}
+
+{% block title %}增加测试套件{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">增加测试套件</h3>
+            </div>
+            <div class="panel-body">
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="suite_name" class="control-label">测试套件名称</label>
+                        <input type="text" id="suite_name" class="form-control" name="suite_name" value="">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="remark">备注</label>
+                        <textarea id="remark" class="form-control" type="text" value="" name="remark"></textarea>
+                    </div>
+
+                    <div class="J_CheckWrap">
+                        {% for api in apis %}
+                        <p>
+                            <a data-toggle="collapse" data-target="#api_{{ api.id }}_div">
+                                <span class="glyphicon glyphicon-minus-sign"></span>
+                            </a>
+                            <input type="checkbox" name="api_{{ api.id }}" />
+                            <a href="{{ url_for('test_manager.api_info', api_id=api.id) }}">{{ api.api_name }}</a>
+                        </p>
+                        <div class="checks collapse in" id="api_{{ api.id }}_div">
+                            {% for test_case in api.test_cases %}
+                            <p>
+                                <a data-toggle="collapse" data-target="#tc_{{ test_case.id }}_div">
+                                    <span class="glyphicon glyphicon-minus-sign"></span>
+                                </a>
+                                <input type="checkbox" name="tc_{{ test_case.id }}" />
+                                <a href="{{ url_for('test_manager.test_case_info', test_case_id=test_case.id) }}">{{ test_case.test_case_name }}</a>
+                            </p>
+                            <div class="checks collapse in" id="tc_{{ test_case.id }}_div">
+                                {% for test_data in test_case.test_datas %}
+                                <p>
+                                    <span class="glyphicon glyphicon-tree-conifer"></span>
+                                    <input type="checkbox" name="td_{{ test_data.id }}" />
+                                    <a href="{{ url_for('test_manager.test_data_info', test_data_id=test_data.id) }}">{{ test_data.test_data_name }}</a>
+                                </p>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input id="submit" class="btn btn-default" type="submit" value="提交" name="submit" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.checktree.js') }}"></script>
+<script>$(".J_CheckWrap").checktree();</script>
+<script>
+    $('div.checks.collapse').on("show.bs.collapse", function () {
+        var span = $(this).prev().children('a').children('span');
+        span.attr('class', 'glyphicon glyphicon-minus-sign');
+    });
+
+    $('div.checks.collapse').on("hidden.bs.collapse", function () {
+        var span = $(this).prev().children('a').children('span');
+        span.attr('class', 'glyphicon glyphicon-plus-sign');
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "test_manager/base_api.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}修改测试数据信息{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="breadcrumb">
+            <li><a href="{{ url_for('test_manager.api_list') }}">接口列表</a></li>
+            <li><a href="{{ url_for('test_manager.api_info', api_id=test_data.test_case.api.id) }}">{{ test_data.test_case.api.api_name }}</a></li>
+            <li><a href="{{ url_for('test_manager.test_case_info', test_case_id=test_data.test_case.id) }}">{{ test_data.test_case.test_case_name }}</a></li>
+            <li class="active">修改测试数据</li>
+        </div>
+    </div>
+    <!--表单部分-->
+    <div class="col-xs-12">
+        <div class="modify_test_data">
+            <div class="form-group">
+                <label for="test_data_id" class="control-label">测试数据ID</label>
+                <input type="text" id="test_data_id" class="form-control" name="test_data_id" value="{{ test_data.id }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="test_data_name" class="control-label">测试数据名称</label>
+                <input type="text" id="test_data_name" class="form-control" name="test_data_name" value="{{ test_data.test_data_name }}">
+            </div>
+            <div class="form-group">
+                <label for="values" class="control-label">测试数据</label>
+                <input type="text" id="values" class="form-control" name="values" value="{{ test_data.values }}">
+            </div>
+            <div class="form-group">
+                <label for="tags" class="control-label">测试数据tags</label>
+                <input type="text" id="tags" class="form-control" name="tags" value="{{ test_data.tags }}">
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="remark">备注</label>
+                <textarea id="remark" class="form-control" type="text" value="{{ test_data.remark }}" name="remark">{{ test_data.remark }}</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="modify_test_data()">修改测试数据</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts%}
+{{ super() }}
+<script>
+//    提交修改测试接口请求
+    function modify_test_data(){
+        var test_data_id = $('#test_data_id').val();
+        var test_data_name = $('#test_data_name').val();
+        var values = $('#values').val();
+        var tags = $('#tags').val();
+        var remark = $('#remark').val();
+
+        if ($.trim(test_data_name) == '' || test_data_name == null || test_data_name == undefined) {
+            alert('测试数据名称不能为空');
+            return
+        }
+
+        $.post("{{ url_for('test_manager.modify_test_data') }}",
+                {
+                    test_data_id: test_data_id,
+                    test_data_name: test_data_name,
+                    values: values,
+                    tags: tags,
+                    remark: remark,
+                },
+                function(data, status){
+                    if(data.result == 100) {
+                        location.href = "{{ url_for('test_manager.test_data_info') }}?test_data_id={{ test_data.id }}";
+                    } else {
+                        alert(data.resultDesc);
+                    };
+                }, "json");
+    }
+</script>
+{% endblock %}

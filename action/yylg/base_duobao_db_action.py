@@ -26,3 +26,5 @@ class Duobao:
         """tb_duobao_link_config表中, link_type=25的配置为新手浮标配置"""
         result = cls.query_link_config_by_link_type('25')
         return result
+
+

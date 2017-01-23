@@ -32,6 +32,9 @@ class FloatingViewAction:
                 5. 如orderNum为nil或空, 则判定用户支付成功次数为0, 如为其它数值, 则判定支付成功次数为orderNum的值
     """
     http = HttpHandle()
+    # image_url和click_url不用管是否真实可用, 只要插入数据库中, 接口按业务逻辑正常返回即可
+    base_image_url = "https://img.winyylg.cn/hyg/product/images/duobao/newerPopup/1481014242939_1.png"
+    base_click_url = "yylgapp://hyg_commodity?id=2016111710PT360704364&showfastparticipant=1"
 
     @classmethod
     def floating_view(cls, data):
@@ -70,3 +73,64 @@ class FloatingViewAction:
                 Log.error('新手浮标配置为: %s' % floating_view_setting)
                 assert False
         Log.info(validate_dict)
+
+    @classmethod
+    def clear_floating_view_config(cls):
+        """清除tb_duobao_link_config表中, link_type=25的配置"""
+        # TODO:
+        pass
+
+    @classmethod
+    def set_floating_view_config(cls, channel, pay_times):
+        """设置新手浮标配置"""
+        # TODO:
+        pass
+
+    @classmethod
+    def clear_user_status(cls, account):
+        """
+        1. 清除用户TB_DUOBAO_USER_PAY_ACT数据
+        2. 清除用户reidsr的new_user_marketing_+userName中orderNum数据
+        """
+        # TODO:
+        pass
+
+    @classmethod
+    def set_user_status(cls, user_pay_times_type):
+        if user_pay_times_type == '1':
+            # TODO:
+            #       删除TB_DUOBAO_USER_PAY_ACT表用户记录,
+            #       删除reidsr的new_user_marketing_+userName中orderNum数据
+            return 0
+        if user_pay_times_type == '2':
+            # TODO:
+            #       TB_DUOBAO_USER_PAY_ACT表中插入该用户记录, first_pay_time字段为Null,
+            #       删除reidsr的new_user_marketing_+userName中orderNum数据
+            return 0
+        if user_pay_times_type == '3':
+            # TODO:
+            #       TB_DUOBAO_USER_PAY_ACT表中插入该用户记录, first_pay_time字段为当前时间,
+            #       删除reidsr的new_user_marketing_+userName中orderNum数据
+            return 0
+        if user_pay_times_type == '4':
+            # TODO:
+            #       TB_DUOBAO_USER_PAY_ACT表中插入该用户记录, first_pay_time字段为当前时间,
+            #       设置reidsr的new_user_marketing_+userName中orderNum数据为2
+            return 2
+        if user_pay_times_type == '5':
+            # TODO:
+            #       删除TB_DUOBAO_USER_PAY_ACT表中插入该用户记录
+            #       设置reidsr的new_user_marketing_+userName中orderNum数据为2
+            return 0
+        if user_pay_times_type == '6':
+            # TODO:
+            #       TB_DUOBAO_USER_PAY_ACT表中插入该用户记录, first_pay_time字段为Null,
+            #       设置reidsr的new_user_marketing_+userName中orderNum数据为2
+            return 0
+
+    @classmethod
+    def expect_config(cls, channel, pay_times):
+        """返回预期的配置值"""
+        expect_image =  "%s?channel=%s&times=%s" % (cls.base_image_url, channel, pay_times)
+        expect_click_url = "%s&channel=%s&times=%s" % (cls.base_click_url, channel, pay_times)
+        return {'image': expect_image, 'clickUrl': expect_click_url}
