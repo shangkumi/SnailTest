@@ -42,4 +42,4 @@ class RedisInfo:
 
 class OpenId:
     USERNAME = 'zhubo'
-    PASSWORD = 'zbwillD1T'
+    PASSWORD = 'xxxxxxxxxxxxxxxxxxxxx'
